@@ -3,7 +3,25 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IMG_BASE } from "../api/tmdb";
 
-export default function MovieGrid({ movies = [] }) {
+export default function MovieGrid({ movies = [] , loading = false }) {
+
+  if (loading) {
+    return (
+      <div className="text-gray-400 text-lg">
+        Loading movies...
+      </div>
+    );
+  }
+
+  if (!movies.length) {
+    return (
+      <div className="text-gray-400 text-lg">
+        No movies found
+      </div>
+    );
+  }
+
+  
   const navigate = useNavigate();
   const gridRef = useRef(null);
   const [savedIds, setSavedIds] = useState(() => {
@@ -17,38 +35,39 @@ export default function MovieGrid({ movies = [] }) {
     }
   });
 
-  // Save movie object to localStorage (watchLater)
-  const saveToWatchLater = (movie) => {
-    // movie must be defined here (inside map scope we pass it)
-    try {
-      const saved = JSON.parse(localStorage.getItem("watchLater")) || [];
-      const exists = saved.some((m) => m.id === movie.id);
-      if (!exists) {
-        // store minimal but useful fields (poster_path is TMDB field)
-        const item = {
-          id: movie.id,
-          title: movie.title,
-          poster_path: movie.poster_path ?? movie.poster, // support both
-          vote_average: movie.vote_average ?? movie.rating,
-          release_date: movie.release_date ?? movie.year,
-        };
-        saved.push(item);
-        localStorage.setItem("watchLater", JSON.stringify(saved));
-        setSavedIds((prev) => [...prev, movie.id]);
-        console.log("Saved Movies:", saved);
-      } else {
-        // optional: remove if already saved (toggle)
-        const filtered = saved.filter((m) => m.id !== movie.id);
-        localStorage.setItem("watchLater", JSON.stringify(filtered));
-        setSavedIds((prev) => prev.filter((id) => id !== movie.id));
-        console.log("Removed from saved:", movie.id);
-      }
-    } catch (err) {
-      console.error("Save to watch later failed:", err);
-    }
-  };
+const toggleWatchLater = (movie) => {
+  const profileId = localStorage.getItem("activeProfileId");
+  if (!profileId) return;
+
+  const key = `watchLater_${profileId}`;
+  const stored = JSON.parse(localStorage.getItem(key)) || [];
+
+  const exists = stored.find((m) => m.id === movie.id);
+
+  let updated;
+  if (exists) {
+    updated = stored.filter((m) => m.id !== movie.id);
+  } else {
+    updated = [
+      ...stored,
+      {
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        vote_average: movie.vote_average,
+      },
+    ];
+  }
+
+  localStorage.setItem(key, JSON.stringify(updated));
+  setSavedIds(updated.map((m) => m.id));
+};
+
+
 
   useEffect(() => {
+
+    
     // simple entrance animation when grid mounts (if you have GSAP)
     // kept safe: only run if gsap is available globally/imported
     (async () => {
@@ -87,19 +106,23 @@ export default function MovieGrid({ movies = [] }) {
             <img src={posterUrl} alt={movie.title} className="w-full h-64 object-cover" />
 
             {/* Save / Bookmark button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation(); // prevent navigating to detail page
-                saveToWatchLater(movie);
-              }}
-              className={`absolute bottom-3 right-3 p-2 rounded-full transition transform ${saved ? "bg-red-600" : "bg-black/60 hover:bg-red-600"}`}
-              aria-label={saved ? "Remove from watch later" : "Save to watch later"}
-            >
-              {/* simple disk icon / bookmark */}
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-5 h-5">
-                <path d="M5.25 5.25v13.5L12 14.25l6.75 4.5V5.25A2.25 2.25 0 0016.5 3H7.5A2.25 2.25 0 005.25 5.25z" />
-              </svg>
-            </button>
+           <button
+  onClick={(e) => {
+    e.stopPropagation();
+    toggleWatchLater(movie);
+  }}
+  className={`absolute bottom-3 right-3 p-2 rounded-full transition
+    ${
+      saved
+        ? "bg-white text-black"
+        : "bg-black/70 text-white hover:bg-red-600"
+    }
+  `}
+>
+  🔖
+</button>
+
+
 
             <div className="p-4">
               <h3 className="text-lg font-bold">{movie.title}</h3>

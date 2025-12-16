@@ -1,52 +1,49 @@
 import { Link } from "react-router-dom";
 
-export default function ProfileSidebar({ open, profile, close }) {
+export default function ProfileSidebar({ open, onClose, profile }) {
   return (
     <>
       {/* Overlay */}
       {open && (
         <div
-          onClick={close}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          onClick={onClose}
+          className="fixed inset-0 bg-black/40 z-40"
         />
       )}
 
+      {/* Sidebar */}
       <aside
-        className={`
-          fixed top-0 right-0 w-72 h-full bg-black text-white z-50 shadow-xl
-          transform ${open ? "translate-x-0" : "translate-x-full"}
-          transition-transform duration-300
-        `}
+        className={`fixed top-0 right-0 h-full w-72 bg-black text-white z-50
+        transform transition-transform duration-300
+        ${open ? "translate-x-0" : "translate-x-full"}`}
       >
-        <div className="p-5 border-b border-gray-700">
+        {/* Header */}
+        <div className="p-5 border-b border-gray-700 text-center">
           <img
-            src={profile.avatar || "https://i.pravatar.cc/80"}
+            src={
+              profile.avatar ||
+              "https://api.dicebear.com/7.x/avataaars/svg?seed=User"
+            }
             className="w-16 h-16 rounded-full mx-auto"
           />
-          <h2 className="text-center text-lg font-bold mt-2">
-            {profile.name || "User"}
-          </h2>
+          <h2 className="mt-3 font-semibold">{profile.name}</h2>
         </div>
 
-        {/* Menu Options */}
-        <div className="flex flex-col p-4 gap-4 text-lg">
+        {/* Menu */}
+        <div className="flex flex-col gap-4 p-5 text-sm">
+          <Link to="/profile" onClick={onClose}>Profile</Link>
+          <Link to="/watch-later" onClick={onClose}>Watch Later</Link>
+          <Link to="/activity" onClick={onClose}>Activity</Link>
 
-          <Link to="/profile" onClick={close}>
-            Edit Profile
-          </Link>
-
-          <Link to="/watch-later" onClick={close}>
-            Watch Later
-          </Link>
-
-          <Link to="/activity" onClick={close}>
-            Your Activity
-          </Link>
-
-          <Link to="/" onClick={close} className="text-red-500">
+          <button
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = "/";
+            }}
+            className="text-red-500 text-left"
+          >
             Exit
-          </Link>
-
+          </button>
         </div>
       </aside>
     </>

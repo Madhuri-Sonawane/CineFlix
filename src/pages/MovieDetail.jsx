@@ -1,72 +1,110 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { fetchMovieDetails, IMG_BASE } from "../api/tmdb";
 
 export default function MovieDetail() {
-  const logActivity = () => {
-  const logs = JSON.parse(localStorage.getItem("activity")) || [];
-  logs.push({
-    id: movie.id,
-    title: movie.title,
-    poster: movie.poster_path,
-    time: new Date().toLocaleString()
-  });
-  localStorage.setItem("activity", JSON.stringify(logs));
-};
-
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [movie, setMovie] = useState(null);
-  const [trailer, setTrailer] = useState(null);
+  const [play, setPlay] = useState(false);
 
   useEffect(() => {
-    fetchMovieDetails(id).then((res) => {
-      setMovie(res);
-
-      const vid = res.videos?.results?.find(
-        (v) => v.type === "Trailer" && v.site === "YouTube"
-      );
-      setTrailer(vid);
-    });
+    fetchMovieDetails(id).then(setMovie);
   }, [id]);
 
-  if (!movie) return <div className="text-white p-6">Loading...</div>;
+  if (!movie) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-6">
+        Loading movie...
+      </div>
+    );
+  }
+
+  const trailer = movie.videos?.results?.find(
+    (v) => v.type === "Trailer" && v.site === "YouTube"
+  );
+
+ const addToActivity = () => {
+  const profileId = localStorage.getItem("activeProfileId");
+  if (!profileId) return;
+
+  const key = `activity_${profileId}`;
+  const stored = JSON.parse(localStorage.getItem(key)) || [];
+
+  const filtered = stored.filter((m) => m.id !== movie.id);
+
+  const item = {
+    id: movie.id,
+    title: movie.title,
+    poster_path: movie.poster_path,
+    watchedAt: Date.now(),
+    progress: Math.floor(Math.random() * 80) + 10,
+  };
+
+  localStorage.setItem(key, JSON.stringify([item, ...filtered]));
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      <img
-        src={`${IMG_BASE}${movie.poster_path}`}
-        className="w-64 h-96 object-cover mx-auto rounded-lg"
-      />
+      {/* Back */}
+      <button onClick={() => navigate(-1)} className="mb-4 text-gray-300">
+        ← Back
+      </button>
 
-      <h1 className="text-4xl font-bold mt-6 text-center">{movie.title}</h1>
-      <p className="text-gray-300 mt-4 text-center max-w-3xl mx-auto">
-        {movie.overview}
-      </p>
+      {/* Movie Info */}
+      <div className="flex flex-col md:flex-row gap-6">
+        <img
+          src={`${IMG_BASE}${movie.poster_path}`}
+          className="w-48 rounded"
+        />
 
-      <div className="flex justify-center gap-4 mt-6">
-        <button className="bg-red-600 px-6 py-2 rounded-md">▶ Play</button>
+        <div>
+          <h1 className="text-3xl font-bold">{movie.title}</h1>
+          <p className="text-gray-400 mt-2 max-w-xl">
+            {movie.overview}
+          </p>
 
-        {trailer && (
-          <button
-            className="bg-gray-700 px-6 py-2 rounded-md"
-            onClick={() =>
-              window.open(`https://youtube.com/watch?v=${trailer.key}`, "_blank")
-            }
-          >
-            🎬 Watch Trailer
-          </button>
-        )}
-         <button
-  className="bg-red-600 px-6 py-2 rounded"
-  onClick={() => {
-    logActivity();
-    // Play movie logic
-  }}
->
-  ▶ Play
-</button>
+          <p className="mt-3">⭐ {movie.vote_average}</p>
 
+          <div className="flex gap-4 mt-6">
+            {trailer && (
+              <button
+                onClick={() => {
+                      addToActivity();
+                      setPlay(true);
+                    }}
+
+                className="bg-white text-black px-6 py-2 rounded font-semibold"
+              >
+                ▶ Play
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Fullscreen Trailer */}
+      {play && trailer && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <button
+            onClick={() => setPlay(false)}
+            className="absolute top-5 right-5 text-white text-xl"
+          >
+            ✕
+          </button>
+
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1`}
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+          />
+        </div>
+      )}
+
     </div>
   );
 }
