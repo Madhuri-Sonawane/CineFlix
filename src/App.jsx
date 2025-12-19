@@ -1,89 +1,48 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import EditProfile from "./pages/EditProfile";
 
 import Section1 from "./section/Section1";
-
-// pages
-import WatchLater from "./pages/WatchLater";
 import Profile from "./pages/Profile";
+import ProfileSelect from "./pages/ProfileSelect";
+import WatchLater from "./pages/WatchLater";
 import Activity from "./pages/Activity";
 import MovieDetail from "./pages/MovieDetail";
-import ProfileSelect from "./pages/ProfileSelect";
-
-/* 🔒 Route Guard */
-function RequireProfile({ children }) {
-  const activeProfile = localStorage.getItem("activeProfileId");
-
-  if (!activeProfile) {
-    return <Navigate to="/profiles" replace />;
-  }
-
-  return children;
-}
+import EditProfile from "./pages/EditProfile";
 
 function App() {
+  const activeProfile = localStorage.getItem("activeProfileId");
+
   return (
-    <BrowserRouter>
+   
       <Routes>
-
-        {/* Profile selector (ALWAYS available) */}
-        <Route path="/profiles" element={<ProfileSelect />} />
-
-        {/* Protected routes */}
+        {/* 🔒 PROFILE SELECTION (Netflix-style) */}
         <Route
-          path="/"
-          element={
-            <RequireProfile>
-              <Section1 />
-            </RequireProfile>
-          }
+          path="/profiles"
+          element={<ProfileSelect />}
         />
 
-        <Route
-          path="/profile"
-          element={
-            <RequireProfile>
-              <Profile />
-            </RequireProfile>
-          }
-        />
+        {/* If no active profile, force profiles screen */}
+        {!activeProfile && (
+          <Route
+            path="*"
+            element={<Navigate to="/profiles" replace />}
+          />
+        )}
 
-        <Route
-          path="/watch-later"
-          element={
-            <RequireProfile>
-              <WatchLater />
-            </RequireProfile>
-          }
-        />
+        {/* 🏠 HOME */}
+        <Route path="/" element={<Section1 />} />
 
-        <Route
-          path="/activity"
-          element={
-            <RequireProfile>
-              <Activity />
-            </RequireProfile>
-          }
-        />
-
-        <Route
-          path="/movie/:id"
-          element={
-            <RequireProfile>
-              <MovieDetail />
-            </RequireProfile>
-          }
-        />
-
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-
-        {/* edit profile */}
+        {/* 👤 PROFILE MANAGEMENT */}
+        <Route path="/profile" element={<Profile />} />
         <Route path="/profile/edit/:id" element={<EditProfile />} />
 
+        {/* 📌 USER FEATURES */}
+        <Route path="/watch-later" element={<WatchLater />} />
+        <Route path="/activity" element={<Activity />} />
 
+        {/* 🎬 MOVIE */}
+        <Route path="/movie/:id" element={<MovieDetail />} />
       </Routes>
-    </BrowserRouter>
+  
   );
 }
 

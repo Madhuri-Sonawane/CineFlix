@@ -70,3 +70,20 @@ export function fetchMovieDetails(id) {
     `${BASE}/movie/${id}?api_key=${API_KEY}&append_to_response=videos`
   );
 }
+
+export function fetchFeaturedMovie() {
+  return fetchJSON(
+    `${BASE}/movie/popular?api_key=${API_KEY}&language=en-US&page=1`
+  );
+}
+
+
+export function fetchKidsFeaturedMovie() {
+  return fetchJSON(
+    `${BASE}/discover/movie?api_key=${API_KEY}&language=en-US
+    &with_genres=16,10751
+    &certification_country=US
+    &certification.lte=G
+    &sort_by=popularity.desc`
+  );
+}

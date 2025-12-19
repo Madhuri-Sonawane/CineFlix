@@ -1,49 +1,114 @@
-import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import gsap from "gsap";
 
 export default function ProfileSidebar({ open, onClose, profile }) {
+  const navigate = useNavigate();
+  const sidebarRef = useRef(null);
+
+  /* =========================
+     SLIDE-IN ANIMATION
+  ========================== */
+  useEffect(() => {
+    if (!open || !sidebarRef.current) return;
+
+    gsap.fromTo(
+      sidebarRef.current,
+      { x: 320 },
+      { x: 0, duration: 0.35, ease: "power3.out" }
+    );
+  }, [open]);
+
+  /* =========================
+     ESC KEY CLOSE
+  ========================== */
+  useEffect(() => {
+    const esc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", esc);
+    return () => document.removeEventListener("keydown", esc);
+  }, [onClose]);
+
+  if (!open) return null;
+
   return (
     <>
-      {/* Overlay */}
-      {open && (
-        <div
-          onClick={onClose}
-          className="fixed inset-0 bg-black/40 z-40"
-        />
-      )}
+      {/* OVERLAY */}
+      <div
+        onClick={onClose}
+        className="fixed inset-0 bg-black/60 z-40"
+      />
 
-      {/* Sidebar */}
+      {/* SIDEBAR */}
       <aside
-        className={`fixed top-0 right-0 h-full w-72 bg-black text-white z-50
-        transform transition-transform duration-300
-        ${open ? "translate-x-0" : "translate-x-full"}`}
+        ref={sidebarRef}
+        className="fixed top-0 right-0 h-full w-80 bg-gray-900 z-50 p-6 flex flex-col"
       >
-        {/* Header */}
-        <div className="p-5 border-b border-gray-700 text-center">
+        {/* HEADER */}
+        <div className="flex items-center gap-4 mb-8">
           <img
-            src={
-              profile.avatar ||
-              "https://api.dicebear.com/7.x/avataaars/svg?seed=User"
-            }
-            className="w-16 h-16 rounded-full mx-auto"
+            src={profile?.avatar}
+            alt={profile?.name}
+            className="w-14 h-14 rounded-full"
           />
-          <h2 className="mt-3 font-semibold">{profile.name}</h2>
+          <div>
+            <p className="font-semibold">{profile?.name}</p>
+            <p className="text-xs text-gray-400 capitalize">
+              {profile?.role || "profile"}
+            </p>
+          </div>
         </div>
 
-        {/* Menu */}
-        <div className="flex flex-col gap-4 p-5 text-sm">
-          <Link to="/profile" onClick={onClose}>Profile</Link>
-          <Link to="/watch-later" onClick={onClose}>Watch Later</Link>
-          <Link to="/activity" onClick={onClose}>Activity</Link>
+        {/* ACTIONS */}
+        <nav className="flex flex-col gap-4 text-sm">
+          <button
+            onClick={() => {
+              onClose();
+              navigate("/profile", { replace: true });
+            }}
+            className="text-left hover:text-red-400 transition"
+          >
+            Manage Profiles
+          </button>
 
           <button
             onClick={() => {
-              localStorage.clear();
-              window.location.href = "/";
+              localStorage.removeItem("activeProfileId");
+              onClose();
+              navigate("/profiles", { replace: true });
             }}
-            className="text-red-500 text-left"
+            className="text-left hover:text-red-400 transition"
           >
-            Exit
+            Switch Profile
           </button>
+
+          <button
+            onClick={() => {
+              onClose();
+              navigate("/watch-later");
+            }}
+            className="text-left hover:text-red-400 transition"
+          >
+            Watch Later
+          </button>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem("activeProfileId");
+              onClose();
+              navigate("/profiles", { replace: true });
+            }}
+            className="text-left text-gray-400 hover:text-red-500 mt-6 transition"
+          >
+            Exit Profile
+          </button>
+        </nav>
+
+        {/* FOOTER */}
+        <div className="mt-auto text-xs text-gray-500">
+          CineFlix • Private Profile
         </div>
       </aside>
     </>

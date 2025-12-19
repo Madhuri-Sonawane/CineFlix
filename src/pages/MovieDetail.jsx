@@ -45,6 +45,29 @@ export default function MovieDetail() {
   localStorage.setItem(key, JSON.stringify([item, ...filtered]));
 };
 
+const saveToActivity = (movie, profileId) => {
+  const key = `activity_${profileId}`;
+  const existing = JSON.parse(localStorage.getItem(key)) || [];
+
+  const progress = Math.min(
+    90,
+    Math.floor(Math.random() * 70) + 20
+  );
+
+  const updated = [
+    {
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      progress,
+      lastPosition: progress * 60,
+      watchedAt: Date.now(),
+    },
+    ...existing.filter((m) => m.id !== movie.id),
+  ];
+
+  localStorage.setItem(key, JSON.stringify(updated));
+};
 
 
   return (
@@ -76,6 +99,7 @@ export default function MovieDetail() {
                       addToActivity();
                       setPlay(true);
                     }}
+                    
 
                 className="bg-white text-black px-6 py-2 rounded font-semibold"
               >
