@@ -13,35 +13,17 @@ function App() {
 
   return (
    
-      <Routes>
-        {/* 🔒 PROFILE SELECTION (Netflix-style) */}
-        <Route
-          path="/profiles"
-          element={<ProfileSelect />}
-        />
+  <Routes>
+  <Route path="/profiles" element={<ProfileSelect />} />
+  <Route path="/profile" element={<Profile />} />
+  <Route path="/profile/edit/:id" element={<EditProfile />} />
 
-        {/* If no active profile, force profiles screen */}
-        {!activeProfile && (
-          <Route
-            path="*"
-            element={<Navigate to="/profiles" replace />}
-          />
-        )}
+  {/* Home */}
+  <Route path="/" element={<Section1 />} />
 
-        {/* 🏠 HOME */}
-        <Route path="/" element={<Section1 />} />
-
-        {/* 👤 PROFILE MANAGEMENT */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/edit/:id" element={<EditProfile />} />
-
-        {/* 📌 USER FEATURES */}
-        <Route path="/watch-later" element={<WatchLater />} />
-        <Route path="/activity" element={<Activity />} />
-
-        {/* 🎬 MOVIE */}
-        <Route path="/movie/:id" element={<MovieDetail />} />
-      </Routes>
+  {/* Fallback */}
+  <Route path="*" element={<Navigate to="/" replace />} />
+</Routes>
   
   );
 }
