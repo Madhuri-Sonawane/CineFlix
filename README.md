@@ -1,16 +1,106 @@
-# React + Vite
+🎬 CineFlix — Movie Streaming UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live Demo: 👉 https://cine-flix-pi.vercel.app/
 
-Currently, two official plugins are available:
+CineFlix is a Netflix-inspired movie streaming frontend application built to simulate how a real OTT platform behaves for different users and profiles.
+The focus of this project is UI behavior, user experience, and realistic product logic, not just fetching movies.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project was built from scratch to practice real-world frontend architecture, profile handling, and state-driven UI flows.
 
-## React Compiler
+✨ What makes this project different?
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This is not a basic movie listing app.
 
-## Expanding the ESLint configuration
+CineFlix includes:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Multiple user profiles (Adult & Kids)
+
+Profile-specific data (watch later, activity, continue watching)
+
+Kids-safe content filtering
+
+Dynamic hero section with animations
+
+Mobile-first responsive behavior
+
+Netflix-style UI interactions
+
+Every profile behaves like a separate user, just like a real streaming platform.
+
+🚀 Features
+👤 Profile System
+
+Create up to 3 profiles
+
+Kids profile with restricted content
+
+Default profile handling
+
+Profile-specific activity & watch history
+
+Persistent profile state using localStorage
+
+🎥 Movie Experience
+
+Featured hero banner (Adult & Kids versions)
+
+Movie discovery using TMDB API
+
+Genre, rating, and year filters
+
+Search functionality (disabled for Kids profile)
+
+Continue Watching row with progress bar
+
+Watch Later list (profile-specific)
+
+🎨 UI & UX
+
+Netflix-inspired layout
+
+Smooth animations using GSAP
+
+Responsive sidebar & mobile filters
+
+Skeleton loaders for better UX
+
+Clean transitions without page reloads
+
+🛠 Tech Stack
+
+Frontend: React (Vite)
+
+Styling: Tailwind CSS
+
+Animations: GSAP
+
+Routing: React Router
+
+API: TMDB (The Movie Database)
+
+State Management: React Hooks + localStorage
+
+Deployment: Vercel
+
+📂 Project Focus
+
+This project was built to demonstrate:
+
+Component-based architecture
+
+Conditional UI rendering based on user role
+
+Handling complex UI states without Redux
+
+Writing scalable frontend logic
+
+Building realistic product-level features
+
+🔗 Live Project
+
+👉 https://cine-flix-pi.vercel.app/
+
+📌 Note
+
+This project is currently frontend-only.
+Backend authentication and database integration are planned as a future enhancement.
