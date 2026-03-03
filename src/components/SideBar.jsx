@@ -1,161 +1,400 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
-export default function Sidebar({
-  open,
-  genres,
-  filters,
-  setFilters,
-  onClose,
-}) {
+/* Genre icon map */
+const GENRE_ICONS = {
+  28: "💥", 12: "🗺️", 16: "🎨", 35: "😂", 80: "🔫",
+  99: "🎥", 18: "🎭", 10751: "👨‍👩‍👧", 14: "🧙", 36: "📜",
+  27: "👻", 10402: "🎵", 9648: "🔍", 10749: "💕", 878: "🚀",
+  53: "🔪", 10752: "⚔️", 37: "🤠",
+};
+
+const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018];
+
+/* Section label */
+function SectionLabel({ children }) {
+  return (
+    <p style={{
+      fontFamily: "'Space Grotesk', sans-serif",
+      fontSize: "0.68rem",
+      fontWeight: 700,
+      letterSpacing: "0.12em",
+      textTransform: "uppercase",
+      color: "var(--brand-text-muted)",
+      marginBottom: "0.6rem",
+    }}>
+      {children}
+    </p>
+  );
+}
+
+export default function Sidebar({ open, genres, filters, setFilters, onClose }) {
   const sidebarRef = useRef(null);
   const overlayRef = useRef(null);
 
-  const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019];
+  /* active filter count */
+  const activeCount =
+    filters.genreIds.length +
+    (filters.rating > 0 ? 1 : 0) +
+    (filters.year ? 1 : 0);
+
+  const clearAll = () =>
+    setFilters({ genreIds: [], rating: 0, year: "" });
 
   /* =========================
      MOBILE ANIMATION ONLY
   ========================== */
   useEffect(() => {
-    if (window.innerWidth >= 1024) return; // ⛔ desktop ignored
-
+    if (window.innerWidth >= 1024) return;
     if (open) {
-      gsap.to(sidebarRef.current, {
-        x: 0,
-        duration: 0.35,
-        ease: "power3.out",
-      });
-      gsap.to(overlayRef.current, {
-        opacity: 1,
-        pointerEvents: "auto",
-        duration: 0.2,
-      });
+      gsap.to(sidebarRef.current, { x: 0, duration: 0.35, ease: "power3.out" });
+      gsap.to(overlayRef.current, { opacity: 1, pointerEvents: "auto", duration: 0.2 });
     } else {
-      gsap.to(sidebarRef.current, {
-        x: -320,
-        duration: 0.3,
-        ease: "power3.in",
-      });
-      gsap.to(overlayRef.current, {
-        opacity: 0,
-        pointerEvents: "none",
-        duration: 0.2,
-      });
+      gsap.to(sidebarRef.current, { x: -320, duration: 0.3, ease: "power3.in" });
+      gsap.to(overlayRef.current, { opacity: 0, pointerEvents: "none", duration: 0.2 });
     }
   }, [open]);
 
-  const toggleGenre = (id) => {
+  const toggleGenre = (id) =>
     setFilters((prev) => ({
       ...prev,
       genreIds: prev.genreIds.includes(id)
         ? prev.genreIds.filter((g) => g !== id)
         : [...prev.genreIds, id],
     }));
-  };
+
+  /* rating colour */
+  const ratingColor =
+    filters.rating >= 7.5 ? "#f59e0b" :
+    filters.rating >= 5   ? "#a78bfa" :
+                             "var(--brand-text-muted)";
 
   return (
     <>
-      {/* =========================
-          MOBILE OVERLAY
-      ========================== */}
+      <style>{`
+        .cf-sidebar::-webkit-scrollbar { width: 4px; }
+        .cf-sidebar::-webkit-scrollbar-track { background: transparent; }
+        .cf-sidebar::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.35); border-radius: 99px; }
+
+        .cf-range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+          border-radius: 99px; outline: none; cursor: pointer; }
+        .cf-range::-webkit-slider-thumb {
+          -webkit-appearance: none; appearance: none;
+          width: 18px; height: 18px; border-radius: 50%;
+          background: linear-gradient(135deg, #7c3aed, #a78bfa);
+          box-shadow: 0 0 10px rgba(124,58,237,0.6);
+          cursor: pointer; border: 2px solid #09080f;
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .cf-range::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 18px rgba(124,58,237,0.8);
+        }
+      `}</style>
+
+      {/* ── MOBILE OVERLAY ── */}
       <div
         ref={overlayRef}
         onClick={onClose}
-        className="fixed inset-0 bg-black/60 z-40 lg:hidden opacity-0 pointer-events-none"
+        className="lg:hidden"
+        style={{
+          position: "fixed", inset: 0, zIndex: 40,
+          background: "rgba(9,8,15,0.7)",
+          backdropFilter: "blur(4px)",
+          opacity: 0, pointerEvents: "none",
+        }}
       />
 
-      {/* =========================
-          SIDEBAR
-      ========================== */}
+      {/* ── SIDEBAR ── */}
       <aside
         ref={sidebarRef}
-        className="
-          fixed lg:sticky
-          top-20 left-0
-          z-50
-          w-64
-          h-[calc(100vh-5rem)]
-          bg-black
-          border-r border-gray-700
-          p-5
-          overflow-y-auto
-          scrollbar-thin scrollbar-thumb-gray-700
+        className="cf-sidebar lg:translate-x-0"
+        style={{
+          position: "fixed",
+          top: "64px", left: 0,
+          zIndex: 50,
+          width: 256,
+          height: "calc(100vh - 64px)",
+          overflowY: "auto",
+          padding: "1.25rem 1rem",
+          transform: "translateX(-320px)",
 
-          transform -translate-x-full
-          lg:translate-x-0
-        "
+          /* glassmorphism */
+          background: "rgba(17, 15, 30, 0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderRight: "1px solid rgba(124,58,237,0.18)",
+
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.5rem",
+        }}
       >
-        {/* MOBILE HEADER */}
-        <div className="flex justify-between items-center mb-4 lg:hidden">
-          <h2 className="text-xl font-bold">Filters</h2>
-          <button onClick={onClose} className="text-lg">✕</button>
-        </div>
+        {/* ── HEADER ── */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 8,
+              background: "rgba(124,58,237,0.2)",
+              border: "1px solid rgba(124,58,237,0.35)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" y1="6" x2="20" y2="6"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+                <line x1="11" y1="18" x2="13" y2="18"/>
+              </svg>
+            </div>
+            <span style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "0.95rem", fontWeight: 700, color: "#f1eeff",
+            }}>
+              Filters
+            </span>
+            {/* Active count badge */}
+            {activeCount > 0 && (
+              <div style={{
+                background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
+                color: "#fff",
+                fontSize: "0.65rem", fontWeight: 700,
+                fontFamily: "'Space Grotesk', sans-serif",
+                borderRadius: 99, padding: "2px 7px",
+                boxShadow: "0 0 10px rgba(124,58,237,0.5)",
+              }}>
+                {activeCount}
+              </div>
+            )}
+          </div>
 
-        {/* DESKTOP TITLE */}
-        <h2 className="text-xl font-bold mb-4 hidden lg:block">
-          Filters
-        </h2>
-
-        {/* GENRES */}
-        <h3 className="text-lg mb-2">Genres</h3>
-        <div className="flex flex-wrap gap-2 mb-6">
-          {genres.map((g) => {
-            const active = filters.genreIds.includes(g.id);
-            return (
+          {/* Clear all + mobile close */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {activeCount > 0 && (
               <button
-                key={g.id}
-                onClick={() => toggleGenre(g.id)}
-                className={`px-3 py-1 text-sm rounded-md border transition
-                  ${
-                    active
-                      ? "bg-red-600 border-red-600"
-                      : "border-gray-400 hover:bg-red-600"
-                  }`}
+                onClick={clearAll}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: "0.72rem", fontWeight: 600,
+                  color: "#a78bfa",
+                  background: "rgba(124,58,237,0.12)",
+                  border: "1px solid rgba(124,58,237,0.25)",
+                  borderRadius: 6, padding: "4px 10px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "rgba(124,58,237,0.25)";
+                  e.currentTarget.style.color = "#f1eeff";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "rgba(124,58,237,0.12)";
+                  e.currentTarget.style.color = "#a78bfa";
+                }}
               >
-                {g.name}
+                Clear
               </button>
-            );
-          })}
+            )}
+            <button
+              onClick={onClose}
+              className="lg:hidden"
+              style={{
+                width: 28, height: 28, display: "flex",
+                alignItems: "center", justifyContent: "center",
+                background: "rgba(124,58,237,0.12)",
+                border: "1px solid rgba(124,58,237,0.25)",
+                borderRadius: 8, cursor: "pointer",
+                color: "#a78bfa", fontSize: "0.85rem",
+              }}
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
-        {/* RATING */}
-        <h3 className="text-lg mb-2">Rating</h3>
-        <input
-          type="range"
-          min="0"
-          max="10"
-          value={filters.rating}
-          onChange={(e) =>
-            setFilters((p) => ({
-              ...p,
-              rating: Number(e.target.value),
-            }))
-          }
-          className="w-full mb-2"
-        />
-        <p className="text-red-400 mb-4">{filters.rating}</p>
+        {/* thin divider */}
+        <div style={{ height: 1, background: "rgba(124,58,237,0.15)", margin: "0 -1rem" }} />
 
-        {/* YEAR */}
-        <h3 className="text-lg mb-2">Year</h3>
-        <select
-          value={filters.year}
-          onChange={(e) =>
-            setFilters((p) => ({ ...p, year: e.target.value }))
-          }
-          className="w-full bg-gray-800 p-2 rounded-md"
-        >
-          <option value="">All</option>
-          {years.map((y) => (
-            <option key={y}>{y}</option>
-          ))}
-        </select>
+        {/* ── GENRES ── */}
+        <div>
+          <SectionLabel>Genres</SectionLabel>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {genres.map((g) => {
+              const active = filters.genreIds.includes(g.id);
+              const icon   = GENRE_ICONS[g.id] || "🎬";
+              return (
+                <button
+                  key={g.id}
+                  onClick={() => toggleGenre(g.id)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "8px 12px",
+                    background: active
+                      ? "rgba(124,58,237,0.22)"
+                      : "rgba(255,255,255,0.03)",
+                    border: active
+                      ? "1px solid rgba(124,58,237,0.55)"
+                      : "1px solid rgba(255,255,255,0.07)",
+                    borderRadius: 10, cursor: "pointer",
+                    transition: "all 0.18s ease",
+                    textAlign: "left", width: "100%",
+                    boxShadow: active ? "0 0 12px rgba(124,58,237,0.2)" : "none",
+                  }}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(124,58,237,0.1)";
+                      e.currentTarget.style.borderColor = "rgba(124,58,237,0.3)";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)";
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: "0.95rem", lineHeight: 1 }}>{icon}</span>
+                  <span style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: "0.82rem",
+                    fontWeight: active ? 700 : 500,
+                    color: active ? "#f1eeff" : "var(--brand-text-dim)",
+                    flex: 1,
+                  }}>
+                    {g.name}
+                  </span>
+                  {active && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="#a78bfa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-        {/* APPLY (MOBILE ONLY) */}
+        {/* thin divider */}
+        <div style={{ height: 1, background: "rgba(124,58,237,0.15)", margin: "0 -1rem" }} />
+
+        {/* ── MIN RATING ── */}
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.6rem" }}>
+            <SectionLabel>Min Rating</SectionLabel>
+            <span style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontSize: "0.9rem", fontWeight: 700,
+              color: ratingColor,
+              transition: "color 0.3s ease",
+            }}>
+              {filters.rating > 0 ? `${filters.rating}+` : "Any"}
+            </span>
+          </div>
+
+          {/* Track background gradient */}
+          <div style={{ position: "relative", marginBottom: "0.75rem" }}>
+            <input
+              type="range"
+              min="0" max="10" step="0.5"
+              value={filters.rating}
+              onChange={(e) => setFilters((p) => ({ ...p, rating: Number(e.target.value) }))}
+              className="cf-range"
+              style={{
+                background: `linear-gradient(to right, #7c3aed ${filters.rating * 10}%, rgba(255,255,255,0.1) ${filters.rating * 10}%)`,
+              }}
+            />
+          </div>
+
+          {/* Rating tick marks */}
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            padding: "0 2px",
+          }}>
+            {[0, 2, 4, 6, 8, 10].map(v => (
+              <span key={v} style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "0.6rem", color: "var(--brand-text-muted)",
+              }}>{v}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* thin divider */}
+        <div style={{ height: 1, background: "rgba(124,58,237,0.15)", margin: "0 -1rem" }} />
+
+        {/* ── YEAR ── */}
+        <div>
+          <SectionLabel>Release Year</SectionLabel>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {/* All option */}
+            <button
+              onClick={() => setFilters(p => ({ ...p, year: "" }))}
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "0.75rem", fontWeight: 600,
+                padding: "5px 12px", borderRadius: 8, cursor: "pointer",
+                background: !filters.year ? "rgba(124,58,237,0.25)" : "rgba(255,255,255,0.04)",
+                border: !filters.year ? "1px solid rgba(124,58,237,0.55)" : "1px solid rgba(255,255,255,0.08)",
+                color: !filters.year ? "#f1eeff" : "var(--brand-text-dim)",
+                transition: "all 0.18s ease",
+              }}
+            >
+              All
+            </button>
+            {years.map((y) => {
+              const active = String(filters.year) === String(y);
+              return (
+                <button
+                  key={y}
+                  onClick={() => setFilters(p => ({ ...p, year: active ? "" : y }))}
+                  style={{
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: "0.75rem", fontWeight: 600,
+                    padding: "5px 10px", borderRadius: 8, cursor: "pointer",
+                    background: active ? "rgba(245,158,11,0.18)" : "rgba(255,255,255,0.04)",
+                    border: active ? "1px solid rgba(245,158,11,0.5)" : "1px solid rgba(255,255,255,0.08)",
+                    color: active ? "#f59e0b" : "var(--brand-text-dim)",
+                    transition: "all 0.18s ease",
+                    boxShadow: active ? "0 0 10px rgba(245,158,11,0.2)" : "none",
+                  }}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(124,58,237,0.1)";
+                      e.currentTarget.style.borderColor = "rgba(124,58,237,0.3)";
+                      e.currentTarget.style.color = "#f1eeff";
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                      e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                      e.currentTarget.style.color = "var(--brand-text-dim)";
+                    }
+                  }}
+                >
+                  {y}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── APPLY (mobile only) ── */}
         <button
           onClick={onClose}
-          className="mt-6 w-full bg-red-600 py-2 rounded lg:hidden"
+          className="lg:hidden"
+          style={{
+            marginTop: "auto",
+            width: "100%", padding: "12px",
+            background: "linear-gradient(135deg, #7c3aed, #a78bfa)",
+            border: "none", borderRadius: 12, cursor: "pointer",
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700, fontSize: "0.9rem",
+            color: "#fff",
+            boxShadow: "0 0 20px rgba(124,58,237,0.4)",
+          }}
         >
-          Apply Filters
+          Apply Filters {activeCount > 0 && `(${activeCount})`}
         </button>
       </aside>
     </>
