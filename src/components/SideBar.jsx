@@ -72,6 +72,16 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
   return (
     <>
       <style>{`
+        /* Desktop: always visible as sticky sidebar */
+        @media (min-width: 1024px) {
+          .cf-sidebar {
+            position: sticky !important;
+            top: 64px !important;
+            transform: translateX(0) !important;
+            height: calc(100vh - 64px);
+            flex-shrink: 0;
+          }
+        }
         .cf-sidebar::-webkit-scrollbar { width: 4px; }
         .cf-sidebar::-webkit-scrollbar-track { background: transparent; }
         .cf-sidebar::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.35); border-radius: 99px; }
@@ -108,7 +118,7 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
       {/* ── SIDEBAR ── */}
       <aside
         ref={sidebarRef}
-        className="cf-sidebar lg:translate-x-0"
+        className="cf-sidebar"
         style={{
           position: "fixed",
           top: "64px", left: 0,
@@ -117,6 +127,7 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
           height: "calc(100vh - 64px)",
           overflowY: "auto",
           padding: "1.25rem 1rem",
+          /* mobile: start off-screen; desktop handled by CSS class below */
           transform: "translateX(-320px)",
 
           /* glassmorphism */

@@ -145,7 +145,7 @@ export default function Section1() {
         profile={profile}
       />
 
-      <div className="flex pt-20 min-h-screen overflow-visible">
+      <div style={{ display: "flex", paddingTop: "80px", minHeight: "100vh" }}>
         {!profile.isKids && (
           <Sidebar
             open={sidebarOpen}
@@ -156,7 +156,7 @@ export default function Section1() {
           />
         )}
 
-        <div className="flex-1 p-6">
+        <div style={{ flex: 1, padding: "1.5rem", minWidth: 0 }}>
           {featured && !isFiltering && (
             <Hero
               movie={{ ...featured, isKids: profile.isKids }}
