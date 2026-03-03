@@ -59,6 +59,11 @@ export default function NavBar({
   }, [sidebarOpen]);
 
   return (
+    <>
+    <style>{`
+      .cf-hamburger { display: none !important; }
+      @media (max-width: 1023px) { .cf-hamburger { display: flex !important; } }
+    `}</style>
     <nav
       ref={navRef}
       style={{
@@ -88,8 +93,8 @@ export default function NavBar({
       <button
         onClick={toggleSidebar}
         aria-label="Toggle sidebar"
+        className="cf-hamburger"
         style={{
-          display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           padding: "8px",
@@ -99,7 +104,6 @@ export default function NavBar({
           cursor: "pointer",
           flexShrink: 0,
         }}
-        className="lg:hidden"
       >
         <div ref={line1} style={{ width: 22, height: 2.5, background: "#a78bfa", borderRadius: 2, marginBottom: 5 }} />
         <div ref={line2} style={{ width: 22, height: 2.5, background: "#a78bfa", borderRadius: 2, marginBottom: 5 }} />
@@ -321,5 +325,7 @@ export default function NavBar({
         </div>
       </div>
     </nav>
+  );
+  </>
   );
 }

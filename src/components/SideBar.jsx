@@ -228,7 +228,7 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
         {/* ── GENRES ── */}
         <div>
           <SectionLabel>Genres</SectionLabel>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
             {genres.map((g) => {
               const active = filters.genreIds.includes(g.id);
               const icon   = GENRE_ICONS[g.id] || "🎬";
@@ -236,9 +236,10 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
                 <button
                   key={g.id}
                   onClick={() => toggleGenre(g.id)}
+                  title={g.name}
                   style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "8px 12px",
+                    display: "flex", alignItems: "center", gap: 7,
+                    padding: "7px 10px",
                     background: active
                       ? "rgba(124,58,237,0.22)"
                       : "rgba(255,255,255,0.03)",
@@ -248,7 +249,8 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
                     borderRadius: 10, cursor: "pointer",
                     transition: "all 0.18s ease",
                     textAlign: "left", width: "100%",
-                    boxShadow: active ? "0 0 12px rgba(124,58,237,0.2)" : "none",
+                    boxShadow: active ? "0 0 10px rgba(124,58,237,0.2)" : "none",
+                    overflow: "hidden",
                   }}
                   onMouseEnter={e => {
                     if (!active) {
@@ -263,19 +265,22 @@ export default function Sidebar({ open, genres, filters, setFilters, onClose }) 
                     }
                   }}
                 >
-                  <span style={{ fontSize: "0.95rem", lineHeight: 1 }}>{icon}</span>
+                  <span style={{ fontSize: "0.85rem", lineHeight: 1, flexShrink: 0 }}>{icon}</span>
                   <span style={{
                     fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "0.82rem",
+                    fontSize: "0.75rem",
                     fontWeight: active ? 700 : 500,
                     color: active ? "#f1eeff" : "var(--brand-text-dim)",
-                    flex: 1,
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
                   }}>
                     {g.name}
                   </span>
                   {active && (
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                      stroke="#a78bfa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                      style={{ marginLeft: "auto", flexShrink: 0 }}
+                      stroke="#a78bfa" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
                   )}
