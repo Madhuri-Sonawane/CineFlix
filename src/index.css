@@ -1,2 +1,330 @@
 @import "tailwindcss";
 
+/* =============================================
+   CINEFLEX — GLOBAL THEME
+   Deep Purple + Gold  ×  Space Grotesk
+============================================= */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* Brand Colors */
+  --brand-bg:           #09080f;      /* near-black with purple undertone */
+  --brand-surface:      #110f1e;      /* card / sidebar background */
+  --brand-surface-2:    #1a1730;      /* elevated surface */
+  --brand-border:       rgba(139, 92, 246, 0.18);
+
+  /* Purple scale */
+  --brand-purple:       #7c3aed;      /* primary accent */
+  --brand-purple-light: #a78bfa;      /* hover / glow */
+  --brand-purple-glow:  rgba(124, 58, 237, 0.45);
+
+  /* Gold scale */
+  --brand-gold:         #f59e0b;      /* primary gold */
+  --brand-gold-light:   #fcd34d;      /* highlights */
+  --brand-gold-glow:    rgba(245, 158, 11, 0.45);
+
+  /* Text */
+  --brand-text:         #f1eeff;
+  --brand-text-dim:     #9d93c4;
+  --brand-text-muted:   #5e567d;
+
+  /* Gradients */
+  --gradient-gold:      linear-gradient(135deg, #f59e0b 0%, #fcd34d 50%, #f59e0b 100%);
+  --gradient-purple:    linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+  --gradient-hero:      linear-gradient(to right, #09080f 0%, #09080f 35%, rgba(9,8,15,0.6) 65%, transparent 100%);
+
+  /* Shadows & Glows */
+  --glow-purple:        0 0 24px rgba(124, 58, 237, 0.5);
+  --glow-gold:          0 0 20px rgba(245, 158, 11, 0.45);
+  --shadow-card:        0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Base Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--brand-bg);
+  color: var(--brand-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Subtle noise texture for depth */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124, 58, 237, 0.12) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+/* ---------- Typography ---------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Custom Scrollbar ---------- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--brand-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-purple);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-purple-light);
+}
+
+/* ---------- Selection ---------- */
+::selection {
+  background: var(--brand-purple);
+  color: #fff;
+}
+
+/* ---------- Tailwind Overrides — Dark Base ---------- */
+/* bg-gray-900 → brand bg */
+.bg-gray-900 { background-color: var(--brand-bg) !important; }
+/* bg-gray-800 → surface */
+.bg-gray-800 { background-color: var(--brand-surface) !important; }
+/* bg-black   → brand bg */
+.bg-black    { background-color: var(--brand-bg) !important; }
+
+/* text-gray-400 → brand text-dim */
+.text-gray-400 { color: var(--brand-text-dim) !important; }
+/* text-gray-300 → slightly brighter */
+.text-gray-300 { color: var(--brand-text-dim) !important; }
+
+/* border-gray-700 / 800 → brand border */
+.border-gray-700, .border-gray-800 {
+  border-color: var(--brand-border) !important;
+}
+
+/* ---------- Range Input (Sidebar slider) ---------- */
+input[type="range"] {
+  accent-color: var(--brand-purple);
+}
+
+/* ---------- Select (Sidebar year) ---------- */
+select {
+  background-color: var(--brand-surface-2) !important;
+  color: var(--brand-text) !important;
+  border: 1px solid var(--brand-border) !important;
+  border-radius: 8px;
+}
+select:focus {
+  outline: none;
+  border-color: var(--brand-purple) !important;
+  box-shadow: var(--glow-purple);
+}
+
+/* ---------- Focus Ring ---------- */
+*:focus-visible {
+  outline: 2px solid var(--brand-purple-light);
+  outline-offset: 2px;
+}
+
+/* ---------- Page Transition ---------- */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#root > * {
+  animation: page-enter 0.4s ease both;
+}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* =============================================
+   CINEFLEX — DESIGN SYSTEM
+   Deep Purple + Gold · Space Grotesk
+============================================= */
+
+:root {
+  /* Brand Colors */
+  --brand-bg:         #0a0a12;
+  --brand-surface:    #12111f;
+  --brand-surface-2:  #1c1a2e;
+  --brand-border:     #2e2a4a;
+
+  --brand-purple:     #7c3aed;
+  --brand-purple-dim: #4c1d95;
+  --brand-purple-glow:#a855f7;
+
+  --brand-gold:       #f59e0b;
+  --brand-gold-light: #fcd34d;
+  --brand-gold-dim:   #92400e;
+
+  --brand-text:       #f0eeff;
+  --brand-text-muted: #9490b5;
+  --brand-text-dim:   #5c5878;
+
+  /* Gradients */
+  --gradient-brand:   linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #f59e0b 100%);
+  --gradient-gold:    linear-gradient(135deg, #f59e0b, #fcd34d);
+  --gradient-surface: linear-gradient(180deg, #1c1a2e 0%, #0a0a12 100%);
+  --gradient-hero:    linear-gradient(to right, #0a0a12 0%, #0a0a1299 55%, transparent 100%);
+
+  /* Shadows & Glows */
+  --glow-purple:      0 0 24px rgba(124, 58, 237, 0.5);
+  --glow-gold:        0 0 20px rgba(245, 158, 11, 0.4);
+  --shadow-card:      0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* =============================================
+   BASE RESET
+============================================= */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--brand-bg);
+  color: var(--brand-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Grain texture overlay on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.4;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================
+   TAILWIND OVERRIDES — BG & SURFACE COLORS
+============================================= */
+
+.bg-black        { background-color: var(--brand-bg) !important; }
+.bg-gray-900     { background-color: var(--brand-bg) !important; }
+.bg-gray-800     { background-color: var(--brand-surface-2) !important; }
+.bg-black\/80    { background-color: rgba(10, 10, 18, 0.85) !important; }
+.bg-black\/40    { background-color: rgba(28, 26, 46, 0.6) !important; }
+.border-gray-800 { border-color: var(--brand-border) !important; }
+.border-gray-700 { border-color: var(--brand-border) !important; }
+
+/* =============================================
+   TAILWIND OVERRIDES — TEXT
+============================================= */
+
+.text-gray-400 { color: var(--brand-text-muted) !important; }
+.text-gray-300 { color: var(--brand-text-muted) !important; }
+.text-white    { color: var(--brand-text) !important; }
+
+/* =============================================
+   TAILWIND OVERRIDES — BRAND ACCENTS
+   Replace ALL red-* with purple/gold
+============================================= */
+
+/* Red → Purple */
+.bg-red-600,
+.hover\:bg-red-600:hover { background-color: var(--brand-purple) !important; }
+.border-red-600           { border-color: var(--brand-purple) !important; }
+.text-red-400             { color: var(--brand-gold) !important; }
+.ring-red-600             { --tw-ring-color: var(--brand-purple-glow) !important; }
+
+/* Progress bars */
+.bg-red-600.rounded       { background: var(--gradient-gold) !important; }
+
+/* =============================================
+   SCROLLBAR
+============================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--brand-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-purple-dim);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-purple);
+}
+
+/* =============================================
+   TYPOGRAPHY UTILITIES
+============================================= */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* =============================================
+   INPUT & FORM ELEMENTS
+============================================= */
+
+input[type="text"],
+input[type="search"],
+select {
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: var(--brand-surface-2) !important;
+  border: 1px solid var(--brand-border);
+  color: var(--brand-text) !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus {
+  outline: none;
+  border-color: var(--brand-purple) !important;
+  box-shadow: var(--glow-purple);
+}
+
+input[type="range"] {
+  accent-color: var(--brand-gold);
+}
+
+/* =============================================
+   SELECTION COLOR
+============================================= */
+
+::selection {
+  background: var(--brand-purple-dim);
+  color: var(--brand-gold-light);
+}
+
+/* =============================================
+   FOCUS VISIBLE
+============================================= */
+
+:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 2px;
+}
