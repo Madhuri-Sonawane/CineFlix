@@ -1,106 +1,93 @@
-🎬 CineFlix — Movie Streaming UI
+# 🎬 Cineflex — Movie Streaming UI
 
-Live Demo: 👉 https://cine-flix-pi.vercel.app/
+**Live Demo → [https://cine-flix-pi.vercel.app/](https://cine-flix-pi.vercel.app/)**
 
-CineFlix is a Netflix-inspired movie streaming frontend application built to simulate how a real OTT platform behaves for different users and profiles.
-The focus of this project is UI behavior, user experience, and realistic product logic, not just fetching movies.
+Cineflex is a Netflix-inspired movie streaming frontend built to simulate how a real OTT platform behaves across multiple users and profiles. The focus is on **UI behavior, user experience, and realistic product logic** — not just fetching and displaying movies.
 
-This project was built from scratch to practice real-world frontend architecture, profile handling, and state-driven UI flows.
+Built from scratch to practice real-world frontend architecture, profile-scoped state management, and animation-driven interactions.
 
-✨ What makes this project different?
+---
 
-This is not a basic movie listing app.
+## ✨ What makes this different?
 
-CineFlix includes:
+This is not a basic movie listing app. Cineflex is built with **product-level thinking**:
 
-Multiple user profiles (Adult & Kids)
+- Every profile behaves like a separate user — its own watchlist, activity, and continue watching row
+- Kids profiles get a completely different experience — restricted content, no search, no filters
+- The UI reacts to state at every level — who's watching, what they've seen, what mood they're in
+- Animations are purposeful, not decorative — entrances, exits, hover states, and loading all have intentional motion
 
-Profile-specific data (watch later, activity, continue watching)
+---
 
-Kids-safe content filtering
+## 🚀 Features
 
-Dynamic hero section with animations
+### 👤 Profile System
+- Create and manage multiple profiles (Adult & Kids)
+- Owner role with elevated permissions — can add, edit, and delete other profiles
+- Kids profile with fully restricted content and hidden filters/search
+- Profile-specific Watch Later list, Watch Activity, and Continue Watching row
+- Animated profile selection screen with gradient avatar rings and entrance animations
+- Edit profile — change name, avatar, role, and optional owner PIN
 
-Mobile-first responsive behavior
+### 🎥 Movie Experience
+- Cinematic hero banner with shimmer letterbox bars, genre tags, and animated star rating
+- Real-time movie discovery via **TMDB API** with debounced search input
+- **Mood-based filtering** — "I'm feeling…" bar with 8 one-click genre presets, each with its own accent color
+- Genre, rating (slider), and year filters — all combinable, with a live active-count badge
+- Continue Watching row with per-profile progress bars
+- Watch Later list with bookmark toggle on every card
+- Movie detail page with blurred backdrop, trailer modal, stats pills, and production info
 
-Netflix-style UI interactions
+### 🎨 UI & UX
+- **Cinematic loading screen** on app launch — animated logo, gold wordmark, progress bar, and scan-line effect
+- Frosted glass sidebar panels throughout — filter sidebar, profile sidebar, trailer modal
+- **Skeleton loading cards** during API fetch — no layout shift, no plain spinners
+- 3D card tilt on hover using GSAP mouse tracking
+- Scroll-aware navbar — opacity and border glow intensify as you scroll
+- Staggered GSAP entrance animations on every page
+- Custom iOS-style toggle switches, pill inputs, and SVG icon system
+- Responsive — sticky sidebar on desktop, animated GSAP drawer on mobile
 
-Every profile behaves like a separate user, just like a real streaming platform.
+---
 
-🚀 Features
-👤 Profile System
+## 🛠 Tech Stack
 
-Create up to 3 profiles
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + Vite |
+| Styling | Tailwind CSS + CSS Variables (design tokens) |
+| Animations | GSAP (GreenSock) |
+| Routing | React Router DOM v6 |
+| API | TMDB (The Movie Database) |
+| State | React Hooks + localStorage |
+| Deployment | Vercel |
 
-Kids profile with restricted content
+**Design system:** Deep Purple + Gold theme built on CSS custom properties — all colors, gradients, and surfaces defined as tokens in `index.css`.
 
-Default profile handling
+---
 
-Profile-specific activity & watch history
+## 📂 Project Focus
 
-Persistent profile state using localStorage
+This project demonstrates:
 
-🎥 Movie Experience
+- Component-based architecture with reusable, self-contained UI pieces (`MoodBar`, `Hero`, `MovieGrid`, `SideBar`, `LoadingScreen`, `ProfileSidebar`)
+- Conditional rendering and access control based on profile role (Owner / Adult / Kids)
+- Complex UI state management without Redux — React Hooks + localStorage only
+- Animation orchestration with GSAP timelines across page entrances, exits, and interactions
+- Realistic product-level UX flows (profile switching, Kids lock, mood filtering, watch progress)
 
-Featured hero banner (Adult & Kids versions)
+---
 
-Movie discovery using TMDB API
+## 📸 Pages
 
-Genre, rating, and year filters
+`/` Home · `/movie/:id` Movie Detail · `/profiles` Profile Select · `/profile` Manage Profiles · `/profile/edit/:id` Edit Profile · `/watch-later` Watch Later · `/activity` Watch Activity
 
-Search functionality (disabled for Kids profile)
+---
 
-Continue Watching row with progress bar
+## 📌 Note
 
-Watch Later list (profile-specific)
+This project is currently **frontend-only**. Backend authentication and database integration are planned as a future enhancement.
 
-🎨 UI & UX
+---
 
-Netflix-inspired layout
-
-Smooth animations using GSAP
-
-Responsive sidebar & mobile filters
-
-Skeleton loaders for better UX
-
-Clean transitions without page reloads
-
-🛠 Tech Stack
-
-Frontend: React (Vite)
-
-Styling: Tailwind CSS
-
-Animations: GSAP
-
-Routing: React Router
-
-API: TMDB (The Movie Database)
-
-State Management: React Hooks + localStorage
-
-Deployment: Vercel
-
-📂 Project Focus
-
-This project was built to demonstrate:
-
-Component-based architecture
-
-Conditional UI rendering based on user role
-
-Handling complex UI states without Redux
-
-Writing scalable frontend logic
-
-Building realistic product-level features
-
-🔗 Live Project
-
-👉 https://cine-flix-pi.vercel.app/
-
-📌 Note
-
-This project is currently frontend-only.
-Backend authentication and database integration are planned as a future enhancement.
+**Live → [https://cine-flix-pi.vercel.app/](https://cine-flix-pi.vercel.app/)**
