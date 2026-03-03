@@ -6,6 +6,7 @@ import NavBar from "../components/NavBar";
 import Sidebar from "../components/SideBar";
 import MovieGrid from "../components/MovieGrid";
 import ProfileSidebar from "../components/ProfileSidebar";
+import MoodBar from "../components/MoodBar";
 
 import {
   fetchGenres,
@@ -64,6 +65,13 @@ export default function Section1() {
     rating: 0,
     year: "",
   });
+
+  const [activeMood, setActiveMood] = useState(null);
+
+  const applyMood = (genreIds) => {
+    setActiveMood(genreIds);
+    setFilters(prev => ({ ...prev, genreIds: genreIds ?? [] }));
+  };
 
   /* =========================
      GENRES
@@ -129,7 +137,7 @@ export default function Section1() {
   ========================== */
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
+    <div style={{ background: "var(--brand-bg)", color: "#f1eeff", minHeight: "100vh" }}>
       <NavBar
         toggleSidebar={() => setSidebarOpen(s => !s)}
         sidebarOpen={sidebarOpen}
@@ -165,35 +173,33 @@ export default function Section1() {
             />
           )}
 
-          {continueWatching.length > 0 && (
-            <div className="mb-10">
-              <h2 className="text-xl font-bold mb-4">
-                Continue Watching
-              </h2>
+          {!profile.isKids && !query.trim() && (
+            <MoodBar activeMood={activeMood} onSelect={applyMood} />
+          )}
 
-              <div className="flex gap-4 overflow-x-auto">
+          {continueWatching.length > 0 && !isFiltering && (
+            <div style={{ marginBottom: "2.5rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "1rem" }}>
+                <span style={{ fontSize: "1.1rem" }}>▶</span>
+                <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#f1eeff", letterSpacing: "-0.01em", position: "relative", paddingBottom: 4 }}>
+                  Continue Watching
+                  <span style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, #7c3aed, #f59e0b)", borderRadius: 99 }} />
+                </h2>
+              </div>
+              <div style={{ display: "flex", gap: "1rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
                 {continueWatching.map(movie => (
-                  <div
-                    key={`${movie.id}-${movie.watchedAt}`}
+                  <div key={`${movie.id}-${movie.watchedAt}`}
                     onClick={() => navigate(`/movie/${movie.id}`)}
-                    className="min-w-[160px] cursor-pointer"
+                    style={{ minWidth: 140, cursor: "pointer", flexShrink: 0 }}
                   >
-                    <img
-                      src={
-                        movie.poster_path
-                          ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-                          : "/no-poster.png"
-                      }
-                      className="rounded h-40 object-cover"
-                      alt={movie.title}
-                    />
-
-                    <div className="h-1 bg-gray-700 mt-1 rounded">
-                      <div
-                        className="h-1 bg-red-600 rounded"
-                        style={{ width: `${movie.progress}%` }}
-                      />
+                    <div style={{ position: "relative", borderRadius: 10, overflow: "hidden", border: "1px solid var(--brand-border)" }}>
+                      <img src={movie.poster_path ? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : "/no-poster.png"}
+                        style={{ width: "100%", height: 160, objectFit: "cover", display: "block" }} alt={movie.title} />
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 3, background: "rgba(255,255,255,0.1)" }}>
+                        <div style={{ height: "100%", width: `${movie.progress}%`, background: "linear-gradient(90deg, #7c3aed, #f59e0b)" }} />
+                      </div>
                     </div>
+                    <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.72rem", fontWeight: 600, color: "var(--brand-text-dim)", marginTop: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{movie.title}</p>
                   </div>
                 ))}
               </div>
