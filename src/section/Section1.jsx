@@ -7,6 +7,7 @@ import Sidebar from "../components/SideBar";
 import MovieGrid from "../components/MovieGrid";
 import ProfileSidebar from "../components/ProfileSidebar";
 import MoodBar from "../components/MoodBar";
+import SupportAgent from "../components/SupportAgent";
 
 import {
   fetchGenres,
@@ -209,6 +210,7 @@ export default function Section1() {
           <MovieGrid movies={movies} loading={loading} />
         </div>
       </div>
+      <SupportAgent />
     </div>
   );
 }
