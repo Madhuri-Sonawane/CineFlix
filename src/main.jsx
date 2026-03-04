@@ -4,6 +4,7 @@ import App from "./App";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import LoadingScreen from "./components/LoadingScreen";
+import SupportAgent from "./components/SupportAgent";
 
 function Root() {
   const [loaded, setLoaded] = useState(false);
@@ -13,6 +14,8 @@ function Root() {
       <div style={{ opacity: loaded ? 1 : 0, transition: "opacity 0.4s ease" }}>
         <App />
       </div>
+      {/* Rendered at root level — outside all page stacking contexts */}
+      {loaded && <SupportAgent />}
     </>
   );
 }
