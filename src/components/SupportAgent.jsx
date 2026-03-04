@@ -1,23 +1,89 @@
 import { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 
-const SYSTEM_PROMPT = `You are Cleo, the friendly AI support assistant for Cineflex — a premium movie streaming platform.
+// ── RESPONSE ENGINE ──────────────────────────────────────────────
+const QA = [
+  {
+    keys: ["kids", "child", "children", "family", "safe", "restrict"],
+    answer: "**Kids Profile** keeps things safe! 🧒\nWhen you create a profile and enable **Kids mode**, it automatically:\n• Shows only family-friendly content\n• Hides the search bar and filters\n• Locks the sidebar genres to Animation & Family\n\nCreate one from the **Profile Select** screen.",
+  },
+  {
+    keys: ["watch later", "watchlater", "bookmark", "save", "saved"],
+    answer: "**Watch Later** lets you save movies for later! 🔖\n\n• Hover over any movie card and click the **bookmark icon**\n• Access your list anytime from the **Profile sidebar → Watch Later**\n• Each profile has its own separate watchlist\n• Remove movies by hovering and clicking ✕",
+  },
+  {
+    keys: ["mood", "feeling", "vibe", "i'm in", "genre preset"],
+    answer: "The **Mood Bar** is one of Cineflex's coolest features! ✨\n\nJust below the hero banner you'll see:\n😂 Comedy · 💥 Action · 😱 Thriller · 💕 Romance\n🚀 Sci-Fi · 🎭 Drama · 🧙 Fantasy · 🔍 Mystery\n\nClick any mood to instantly filter movies to that genre. Click again to deselect!",
+  },
+  {
+    keys: ["edit", "change name", "update profile", "avatar", "rename"],
+    answer: "To **edit your profile**: 🖊️\n\n1. Click your avatar in the top-right navbar\n2. Select **Manage Profiles**\n3. Click the ✏️ pencil icon on any profile card\n4. Change your name, avatar, or role\n5. Hit **Save Changes**\n\nOnly the Owner profile can edit other profiles.",
+  },
+  {
+    keys: ["filter", "genre", "year", "rating", "sidebar"],
+    answer: "The **Filter Sidebar** on the left has three sections: 🎯\n\n• **Genres** — 2-column grid, select multiple\n• **Min Rating** — drag the slider (0–10)\n• **Year** — tap any year button to filter\n\nAll filters combine together and update results instantly. A badge shows how many filters are active. Hit **Clear** to reset everything.",
+  },
+  {
+    keys: ["search", "find", "look for", "looking for"],
+    answer: "Use the **Search bar** in the navbar to find any movie! 🔍\n\nJust start typing — results update automatically with a 350ms debounce so it doesn't spam the API.\n\nNote: Search is **disabled for Kids profiles** to keep content safe.",
+  },
+  {
+    keys: ["profile", "create", "add profile", "new profile", "multiple"],
+    answer: "Cineflex supports **multiple profiles**, just like Netflix! 👤\n\n• Go to **/profiles** to create your first profile\n• Choose a name, avatar, and enable Kids mode if needed\n• The first profile becomes the **Owner** automatically\n• Owner can add, edit, and delete other profiles\n• Each profile has its own watch history and lists",
+  },
+  {
+    keys: ["activity", "history", "watched", "continue watching", "progress"],
+    answer: "Your **Watch Activity** tracks everything you've opened! 🕐\n\n• Visit a movie's detail page to log it to your history\n• The **Continue Watching** row on the home page shows recent movies with progress bars\n• Go to **Activity page** (via sidebar) for your full history\n• Progress turns green when a movie is 80%+ complete\n• You can **Clear History** from the Activity page",
+  },
+  {
+    keys: ["trailer", "watch trailer", "video", "play"],
+    answer: "To watch a **trailer**: 🎬\n\n1. Click any movie card or the **More Info** button on the hero\n2. On the Movie Detail page, click **Watch Trailer**\n3. A cinematic modal opens with the embedded trailer\n4. Press ✕ or click outside to close\n\nTrailers are sourced directly from TMDB's video API.",
+  },
+  {
+    keys: ["hero", "banner", "featured", "homepage"],
+    answer: "The **Hero Banner** showcases a featured movie on the homepage! 🌟\n\n• Shows a different featured movie for Adults vs Kids profiles\n• Includes genre tags, star rating bar, and overview\n• **Play Now** → goes to the movie detail page\n• **More Info** → same destination with full details\n• Animates in with shimmer letterbox bars on load",
+  },
+  {
+    keys: ["switch", "change profile", "different profile", "log out"],
+    answer: "To **switch profiles**: 🔀\n\n1. Click your avatar in the top-right navbar\n2. Select **Switch Profile** from the panel\n3. You'll be taken back to the Profile Select screen\n4. Pick any profile to jump straight in\n\nEach profile loads its own data instantly.",
+  },
+  {
+    keys: ["owner", "role", "permission", "admin", "delete profile"],
+    answer: "The **Owner role** is the admin of all profiles 👑\n\n• Automatically assigned to the first profile created\n• Can add, edit, and delete other profiles\n• Can set an optional 4-digit PIN for extra security\n• Only the Owner can promote another profile to Owner\n• Kids profiles cannot be edited by non-owners",
+  },
+  {
+    keys: ["loading", "intro", "launch", "startup", "screen"],
+    answer: "The **Cinematic Loading Screen** plays once on launch! 🎬\n\n• Black screen with sliding cinematic bars (top + bottom)\n• Cineflex logo drops in with a bounce animation\n• Gold wordmark glows in from the left\n• Progress bar fills from 0→100%\n• A purple scan line sweeps across\n• Everything exits smoothly before the app fades in",
+  },
+  {
+    keys: ["tech", "built", "stack", "react", "api", "tmdb", "gsap"],
+    answer: "**Cineflex Tech Stack** ⚙️\n\n• **React 18 + Vite** — frontend framework\n• **TMDB API** — all movie data, posters & trailers\n• **GSAP** — all animations and transitions\n• **Tailwind CSS + CSS Variables** — styling & design tokens\n• **React Router v6** — page routing\n• **localStorage** — profile & watchlist persistence\n• **Vercel** — deployment",
+  },
+  {
+    keys: ["hi", "hello", "hey", "hii", "sup", "yo", "help"],
+    answer: "Hey there! 👋 I'm **Cleo**, your Cineflex assistant.\n\nI can help you with:\n• Creating and managing profiles\n• Using filters and mood-based search\n• Watch Later & Activity history\n• Trailers, hero banner, and more\n\nWhat would you like to know? 🎬",
+  },
+  {
+    keys: ["thanks", "thank you", "thx", "ty", "great", "awesome", "perfect"],
+    answer: "Happy to help! 🎉 Enjoy your movies on Cineflex. If you have any more questions, I'm right here! 🍿",
+  },
+];
 
-Cineflex features:
-- Multi-profile system: users can create Adult and Kids profiles. Each profile has its own Watch Later list, Watch Activity, and Continue Watching row.
-- Owner role: the first profile created is the Owner, who can add/edit/delete other profiles.
-- Kids profile: restricted content, no search, no filters, safe movies only.
-- Movie discovery: powered by TMDB API. Users can search, filter by genre, rating, and year.
-- Mood filtering: "I'm feeling…" bar with 8 mood presets (Comedy, Action, Thriller, Romance, Sci-Fi, Drama, Fantasy, Mystery).
-- Watch Later: bookmark any movie from the grid using the bookmark icon on movie cards.
-- Activity page: shows watch history with progress bars. Can be cleared.
-- Hero banner: featured movie shown on homepage with Play and More Info buttons.
-- Filters sidebar: on the left — genre (2-column grid), rating slider, year buttons. Has a Clear button when filters are active.
-- Trailer: available on the Movie Detail page via the Watch Trailer button.
-- Profile editing: click the pencil icon on Manage Profiles page to edit name, avatar, role, and PIN.
-- Loading screen: cinematic intro plays once on app launch.
+const FALLBACK = "Hmm, I'm not sure about that one! 🤔\n\nTry asking me about:\n• **Profiles** — creating, editing, Kids mode\n• **Filters** — genre, rating, year, mood bar\n• **Watch Later** — bookmarking movies\n• **Activity** — watch history & progress\n• **Trailers** — how to watch them";
 
-Keep answers short, friendly, and helpful. If someone asks something unrelated to Cineflex, politely redirect them. Use a warm, slightly playful tone. Address the user by name if they mention it. Never make up features that don't exist.`;
+function getReply(input) {
+  const text = input.toLowerCase();
+  for (const item of QA) {
+    if (item.keys.some(k => text.includes(k))) return item.answer;
+  }
+  return FALLBACK;
+}
+
+// Simulate typing delay based on response length
+function replyDelay(text) {
+  return Math.min(600 + text.length * 8, 2200);
+}
+// ─────────────────────────────────────────────────────────────────
 
 const SUGGESTIONS = [
   "How do I create a Kids profile?",
@@ -32,7 +98,7 @@ function TypingIndicator() {
       {[0, 1, 2].map(i => (
         <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#a78bfa", animation: `cf-bounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
       ))}
-      <style>{`@keyframes cf-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }`}</style>
+      <style>{`@keyframes cf-bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}`}</style>
     </div>
   );
 }
@@ -42,14 +108,14 @@ export default function SupportAgent() {
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hey! I'm **Cleo**, your Cineflex assistant 🎬\nHow can I help you today?" }
   ]);
-  const [input,    setInput]    = useState("");
-  const [loading,  setLoading]  = useState(false);
-  const [unread,   setUnread]   = useState(0);
+  const [input,   setInput]   = useState("");
+  const [loading, setLoading] = useState(false);
+  const [unread,  setUnread]  = useState(0);
 
-  const panelRef   = useRef(null);
-  const buttonRef  = useRef(null);
-  const bottomRef  = useRef(null);
-  const inputRef   = useRef(null);
+  const panelRef  = useRef(null);
+  const buttonRef = useRef(null);
+  const bottomRef = useRef(null);
+  const inputRef  = useRef(null);
 
   /* ── open/close animation ── */
   useEffect(() => {
@@ -68,7 +134,7 @@ export default function SupportAgent() {
     }
   }, [open]);
 
-  /* ── scroll to bottom on new message ── */
+  /* ── scroll to bottom ── */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -83,49 +149,33 @@ export default function SupportAgent() {
     }
   }, [unread]);
 
-  const sendMessage = async (text) => {
+  const sendMessage = (text) => {
     const userText = (text || input).trim();
     if (!userText || loading) return;
     setInput("");
 
-    const newMessages = [...messages, { role: "user", content: userText }];
-    setMessages(newMessages);
+    setMessages(prev => [...prev, { role: "user", content: userText }]);
     setLoading(true);
 
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
-        }),
-      });
-      const data = await res.json();
-      const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response. Try again!";
+    const reply = getReply(userText);
+    setTimeout(() => {
       setMessages(prev => [...prev, { role: "assistant", content: reply }]);
-      if (!open) setUnread(u => u + 1);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Hmm, something went wrong on my end. Please try again in a moment!" }]);
-    } finally {
       setLoading(false);
-    }
+      if (!open) setUnread(u => u + 1);
+    }, replyDelay(reply));
   };
 
-  /* ── render markdown-lite (bold + newlines) ── */
-  const renderText = (text) => {
-    return text.split("\n").map((line, i) => {
+  /* ── render bold + newlines ── */
+  const renderText = (text) =>
+    text.split("\n").map((line, i, arr) => {
       const parts = line.split(/\*\*(.*?)\*\*/g);
       return (
         <span key={i}>
           {parts.map((p, j) => j % 2 === 1 ? <strong key={j}>{p}</strong> : p)}
-          {i < text.split("\n").length - 1 && <br />}
+          {i < arr.length - 1 && <br />}
         </span>
       );
     });
-  };
 
   return (
     <>
@@ -144,6 +194,7 @@ export default function SupportAgent() {
           display: "flex", flexDirection: "column",
           overflow: "hidden",
         }}>
+
           {/* Top shimmer */}
           <div style={{ height: 2, background: "linear-gradient(90deg, transparent, #7c3aed, #f59e0b, transparent)", flexShrink: 0 }} />
 
@@ -161,8 +212,7 @@ export default function SupportAgent() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "14px 14px 8px", display: "flex", flexDirection: "column", gap: 10 }}
-            className="cf-chat-scroll">
+          <div style={{ flex: 1, overflowY: "auto", padding: "14px 14px 8px", display: "flex", flexDirection: "column", gap: 10 }} className="cf-chat-scroll">
             <style>{`.cf-chat-scroll::-webkit-scrollbar{width:3px}.cf-chat-scroll::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.3);border-radius:99px}`}</style>
 
             {messages.map((msg, i) => {
@@ -170,16 +220,12 @@ export default function SupportAgent() {
               return (
                 <div key={i} style={{ display: "flex", justifyContent: isUser ? "flex-end" : "flex-start" }}>
                   <div style={{
-                    maxWidth: "82%",
-                    padding: "9px 13px",
+                    maxWidth: "82%", padding: "9px 13px",
                     borderRadius: isUser ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                    background: isUser
-                      ? "linear-gradient(135deg, #7c3aed, #a78bfa)"
-                      : "rgba(124,58,237,0.1)",
+                    background: isUser ? "linear-gradient(135deg, #7c3aed, #a78bfa)" : "rgba(124,58,237,0.1)",
                     border: isUser ? "none" : "1px solid rgba(124,58,237,0.2)",
                     fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "0.83rem",
-                    lineHeight: 1.55,
+                    fontSize: "0.83rem", lineHeight: 1.55,
                     color: isUser ? "#fff" : "#d4cff0",
                     boxShadow: isUser ? "0 4px 16px rgba(124,58,237,0.35)" : "none",
                   }}>
@@ -201,7 +247,8 @@ export default function SupportAgent() {
           {messages.length === 1 && (
             <div style={{ padding: "0 14px 10px", display: "flex", gap: 6, flexWrap: "wrap", flexShrink: 0 }}>
               {SUGGESTIONS.map(s => (
-                <button key={s} onClick={() => sendMessage(s)} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.7rem", fontWeight: 600, color: "#a78bfa", background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 99, padding: "5px 11px", cursor: "pointer", transition: "all 0.18s ease" }}
+                <button key={s} onClick={() => sendMessage(s)}
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.7rem", fontWeight: 600, color: "#a78bfa", background: "rgba(124,58,237,0.1)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: 99, padding: "5px 11px", cursor: "pointer", transition: "all 0.18s ease" }}
                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(124,58,237,0.22)"; e.currentTarget.style.color = "#f1eeff"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.1)"; e.currentTarget.style.color = "#a78bfa"; }}>
                   {s}
@@ -211,15 +258,13 @@ export default function SupportAgent() {
           )}
 
           {/* Input */}
-          <div style={{ padding: "10px 12px 14px", borderTop: "1px solid rgba(124,58,237,0.12)", display: "flex", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
-            <input
-              ref={inputRef}
-              value={input}
+          <div style={{ padding: "10px 12px 14px", borderTop: "1px solid rgba(124,58,237,0.12)", display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+            <input ref={inputRef} value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
+              onKeyDown={e => e.key === "Enter" && sendMessage()}
               placeholder="Ask Cleo anything…"
               disabled={loading}
-              style={{ flex: 1, padding: "9px 13px", background: "rgba(26,23,48,0.9)", border: "1.5px solid rgba(124,58,237,0.25)", borderRadius: 12, color: "#f1eeff", fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.83rem", outline: "none", transition: "border-color 0.2s", resize: "none" }}
+              style={{ flex: 1, padding: "9px 13px", background: "rgba(26,23,48,0.9)", border: "1.5px solid rgba(124,58,237,0.25)", borderRadius: 12, color: "#f1eeff", fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.83rem", outline: "none", transition: "border-color 0.2s" }}
               onFocus={e => e.target.style.borderColor = "rgba(124,58,237,0.6)"}
               onBlur={e => e.target.style.borderColor = "rgba(124,58,237,0.25)"}
             />
@@ -233,7 +278,7 @@ export default function SupportAgent() {
         </div>
       )}
 
-      {/* ── FAB BUTTON ── */}
+      {/* ── FAB ── */}
       <button ref={buttonRef} onClick={() => setOpen(o => !o)}
         style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 1001,
@@ -248,15 +293,10 @@ export default function SupportAgent() {
         onMouseEnter={e => { if (!open) e.currentTarget.style.transform = "scale(1.1)"; }}
         onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
       >
-        {open ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        )}
-
-        {/* Unread badge */}
+        {open
+          ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        }
         {unread > 0 && !open && (
           <div style={{ position: "absolute", top: -2, right: -2, width: 18, height: 18, borderRadius: "50%", background: "#f59e0b", border: "2px solid #09080f", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Space Grotesk', sans-serif", fontSize: "0.6rem", fontWeight: 800, color: "#09080f" }}>
             {unread}
